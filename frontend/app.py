@@ -30,20 +30,32 @@ st.markdown("""
     :root {
         --primary: #6366f1;
         --secondary: #a855f7;
-        --bg-dark: #0d1117;
+        --bg-dark: #0f172a;
         --card-bg: rgba(30, 41, 59, 0.7);
         --text-muted: #94a3b8;
     }
 
-    html, body, [class*="css"] {
+    /* Force Streamlit Variables */
+    [data-testid="stAppViewContainer"] {
+        background-color: var(--bg-dark);
+        color: #f8fafc !important;
+    }
+
+    /* Hide the white header */
+    header[data-testid="stHeader"] {
+        background-color: rgba(15, 23, 42, 0.8) !important;
+        backdrop-filter: blur(10px);
+    }
+
+    html, body, [class*="css"], .stMarkdown, p, span, h1, h2, h3, h4, label {
         font-family: 'Inter', sans-serif;
-        color: #f8fafc;
+        color: #f8fafc !important;
     }
     
     .stApp {
         background: radial-gradient(circle at 20% 10%, rgba(99, 102, 241, 0.15), transparent),
                     radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15), transparent),
-                    #0f172a;
+                    #0f172a !important;
     }
     
     .main-header {
@@ -56,6 +68,11 @@ st.markdown("""
         margin-bottom: 0px;
         letter-spacing: -1px;
         animation: fadeInDown 0.8s ease-out;
+    }
+
+    /* Ensure radio/checkbox labels are visible */
+    [data-testid="stWidgetLabel"] p {
+        color: #f8fafc !important;
     }
 
     @keyframes fadeInDown {
@@ -82,7 +99,7 @@ st.markdown("""
     .stButton>button {
         width: 100%;
         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
+        color: white !important;
         border: none;
         padding: 14px;
         border-radius: 12px;
