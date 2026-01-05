@@ -22,7 +22,7 @@ htmlcov/
 
 # User data and indices
 data/
-knowledge_base/faiss_index/
+# knowledge_base/faiss_index/ - Uncommented to allow deployment data
 *.docx
 temp_vpm.docx
 
