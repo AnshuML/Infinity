@@ -127,6 +127,50 @@ st.markdown("""
         background: #475569;
     }
 
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #0d1117 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: transparent;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        background-color: rgba(30, 41, 59, 0.5);
+        border-radius: 10px 10px 0 0;
+        gap: 0;
+        padding: 10px 20px;
+        color: var(--text-muted);
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background-color: var(--card-bg) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-bottom: none !important;
+    }
+
+    /* Expander Styling */
+    .streamlit-expanderHeader {
+        background-color: rgba(30, 41, 59, 0.4) !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .streamlit-expanderContent {
+        background-color: rgba(15, 23, 42, 0.3) !important;
+        border-radius: 0 0 10px 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-top: none !important;
+    }
+
     /* Status Badges */
     .badge {
         display: inline-block;
