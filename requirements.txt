@@ -17,3 +17,5 @@ openpyxl
 numpy
 streamlit
 graphviz
+sentence-transformers
+torch
