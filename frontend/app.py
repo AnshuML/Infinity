@@ -70,8 +70,43 @@ st.markdown("""
         animation: fadeInDown 0.8s ease-out;
     }
 
-    /* Ensure radio/checkbox labels are visible */
+    /* Force radio/checkbox labels are visible */
     [data-testid="stWidgetLabel"] p {
+        color: #f8fafc !important;
+    }
+
+    /* File Uploader Dark Force */
+    [data-testid="stFileUploader"] {
+        background-color: rgba(30, 41, 59, 0.5) !important;
+        border: 2px dashed rgba(99, 102, 241, 0.3) !important;
+        border-radius: 12px !important;
+        padding: 10px !important;
+    }
+    
+    [data-testid="stFileUploader"] section {
+        background-color: transparent !important;
+    }
+
+    [data-testid="stFileUploader"] label, [data-testid="stFileUploader"] p, [data-testid="stFileUploader"] span {
+        color: #f8fafc !important;
+    }
+
+    /* Input/Text Area Dark Force */
+    .stTextArea textarea, .stTextInput input {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Selectbox/Dropdown Dark Force */
+    [data-baseweb="select"] {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+    }
+    [data-baseweb="select"] * {
+        color: #f8fafc !important;
+    }
+    [data-testid="stVirtualDropdown"] li {
+        background-color: #1e293b !important;
         color: #f8fafc !important;
     }
 
