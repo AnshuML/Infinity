@@ -35,11 +35,11 @@ Leverage the best of both worlds!
 ## 🛠 Features Breakdown
 
 - ** Strategic Scope Generation:** Automatically creates high-quality Scope Documents with Objectives, In-Scope/Out-of-Scope boundaries, and Navigation structures.
-- **📄 Site-Map & Content Framework:** Generates page-by-page functional requirements and CTA strategies.
-- **🔍 Automated Gap Analysis:** Identifies what the client *didn't* say but *needs* to know.
-- **📚 Knowledge Base (RAG):** Uses Vector Search (FAISS + Sentence Transformers) to compare current projects against past successful ones for consistency.
-- **📥 Feedback Loop:** Stakeholder comments are instantly re-indexed into the knowledge base to improve future AI outputs.
-- **📤 Multi-Format Export:** Export your professional documents to **Markdown** or **DOCX** with one click.
+- ** Site-Map & Content Framework:** Generates page-by-page functional requirements and CTA strategies.
+- ** Automated Gap Analysis:** Identifies what the client *didn't* say but *needs* to know.
+- ** Knowledge Base (RAG):** Uses Vector Search (FAISS + Sentence Transformers) to compare current projects against past successful ones for consistency.
+- ** Feedback Loop:** Stakeholder comments are instantly re-indexed into the knowledge base to improve future AI outputs.
+- ** Multi-Format Export:** Export your professional documents to **Markdown** or **DOCX** with one click.
 
 ---
 
@@ -114,14 +114,14 @@ This project demonstrates **Full-Stack AI Engineering** capabilities:
 
 ---
 
-## 🔮 Roadmap & Future Enhancements
+##  Roadmap & Future Enhancements
 Planned features to evolve Infinity into a complete AI Project Office:
-- **🎙️ Multimodal Ingestion:** Support for audio meeting recordings (Whisper) and whiteboard OCR.
-- **📅 AI Project Timelines:** Automated generation of Gantt charts and delivery estimates.
-- **💰 Resource Estimator:** AI-driven budget and headcount forecasting based on scope complexity.
-- **🛠️ Production Integrations:** Direct export of requirements to Jira, Trello, or Asana.
-- **🗣️ AI Elevator Pitch:** Automated voice summaries (TTS) of project visions for stakeholders.
-- **🌍 Multi-Lingual Support:** Native ingestion of diverse languages with global English output.
+- ** Multimodal Ingestion:** Support for audio meeting recordings (Whisper) and whiteboard OCR.
+- **AI Project Timelines:** Automated generation of Gantt charts and delivery estimates.
+- **Resource Estimator:** AI-driven budget and headcount forecasting based on scope complexity.
+- ** Production Integrations:** Direct export of requirements to Jira, Trello, or Asana.
+- **AI Elevator Pitch:** Automated voice summaries (TTS) of project visions for stakeholders.
+- ** Multi-Lingual Support:** Native ingestion of diverse languages with global English output.
 
 ---
 Developed with  by **Anshu**
