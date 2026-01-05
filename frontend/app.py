@@ -178,7 +178,7 @@ else:
         with col_out:
             if 'vpm_scope' in st.session_state:
                 scope = st.session_state['vpm_scope']
-                st.success("✅ Strategic Scope Generated")
+                st.success(" Strategic Scope Generated")
                 
                 st.write(f"### {scope.project_title}")
                 
@@ -188,29 +188,29 @@ else:
                 
                 col_scope_a, col_scope_b = st.columns(2)
                 with col_scope_a:
-                    with st.expander("✅ In Scope", expanded=True):
+                    with st.expander(" In Scope", expanded=True):
                         for item in scope.scope_in:
                             st.markdown(f"- {item}")
                 with col_scope_b:
-                    with st.expander("🚫 Out of Scope", expanded=True):
+                    with st.expander(" Out of Scope", expanded=True):
                         for item in scope.scope_out:
                             st.markdown(f"- {item}")
                 
-                st.error("⚠️ Gap Analysis (Missing Information)")
+                st.error(" Gap Analysis (Missing Information)")
                 for gap in scope.gap_analysis:
                     st.markdown(f"- {gap}")
                 
-                with st.expander("🗺️ Navigation Preview", expanded=False):
+                with st.expander(" Navigation Preview", expanded=False):
                     for n in scope.navigation:
                         st.markdown(f"- {n}")
                 
-                st.info("💡 Next Step: Go to the 'Content Framework' tab to design the sitemap.")
+                st.info(" Next Step: Go to the 'Content Framework' tab to design the sitemap.")
                 try:
                     md_scope = scope_to_markdown(scope)
                     st.download_button("Download Scope (Markdown)", md_scope, file_name="scope.md")
                     st.download_button("Download Scope (DOCX)", scope_to_docx(scope), file_name="scope.docx")
                     qc_scope = check_scope(scope)
-                    with st.expander("🔍 Scope Quality Checks", expanded=False):
+                    with st.expander(" Scope Quality Checks", expanded=False):
                         st.write(f"Status: **{qc_scope['status']}**")
                         st.write(f"Terminology Score: {qc_scope['terminology_score']:.2f}")
                         st.write(f"Complete: {qc_scope['complete']}")
@@ -255,11 +255,11 @@ else:
             with col_frame_b:
                 if 'vpm_framework' in st.session_state:
                     frame = st.session_state['vpm_framework']
-                    st.success("✅ Content Framework Ready")
+                    st.success(" Content Framework Ready")
                     
-                    st.info(f"🎯 **CTA Strategy:** {frame.cta_strategy}")
+                    st.info(f" **CTA Strategy:** {frame.cta_strategy}")
 
-                    st.write("### 🌐 Visual Architecture")
+                    st.write("###  Visual Architecture")
                     try:
                         import graphviz
                         dot = graphviz.Digraph(comment='Sitemap')
@@ -293,7 +293,7 @@ else:
                         st.download_button("Download Framework (Markdown)", md_framework, file_name="content_framework.md")
                         st.download_button("Download Framework (DOCX)", framework_to_docx(frame), file_name="content_framework.docx")
                         qc_fw = check_framework(frame)
-                        with st.expander("🔍 Framework Quality Checks", expanded=False):
+                        with st.expander(" Framework Quality Checks", expanded=False):
                             st.write(f"Status: **{qc_fw['status']}**")
                             st.write(f"Glossary Coverage: {qc_fw['glossary_coverage']:.2f}")
                             st.write(f"Complete: {qc_fw['complete']}")
@@ -341,7 +341,7 @@ else:
                     doc_id = item.get("id", "Unknown")
                     content = item.get("content", "")
                     with st.expander(f"📁 {doc_id}"):
-                        st.text_area("Stored Mapping (Input -> Output)", content, height=300, disabled=True, key=f"kb_view_{idx}_{doc_id}")
+                        st.text_area("Stored Mapping (Input -> Output)", content, height=300, disabled=True, key=f"kb_item_{idx}")
             else:
                 st.info("Knowledge base is empty. Please run the ingestion script to load training data.")
         except Exception as e:
