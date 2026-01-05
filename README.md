@@ -113,4 +113,15 @@ This project demonstrates **Full-Stack AI Engineering** capabilities:
 4. **Product Mindset:** Focusing on "Gap Analysis" and "Maturity Scores"—real-world PM problems.
 
 ---
+
+## 🔮 Roadmap & Future Enhancements
+Planned features to evolve Infinity into a complete AI Project Office:
+- **🎙️ Multimodal Ingestion:** Support for audio meeting recordings (Whisper) and whiteboard OCR.
+- **📅 AI Project Timelines:** Automated generation of Gantt charts and delivery estimates.
+- **💰 Resource Estimator:** AI-driven budget and headcount forecasting based on scope complexity.
+- **🛠️ Production Integrations:** Direct export of requirements to Jira, Trello, or Asana.
+- **🗣️ AI Elevator Pitch:** Automated voice summaries (TTS) of project visions for stakeholders.
+- **🌍 Multi-Lingual Support:** Native ingestion of diverse languages with global English output.
+
+---
 Developed with  by **Anshu**
