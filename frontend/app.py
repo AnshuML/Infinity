@@ -25,52 +25,116 @@ st.set_page_config(page_title="VPM - Virtual Project Manager", layout="wide")
 # Premium UI Styling
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@400;700&display=swap');
     
+    :root {
+        --primary: #6366f1;
+        --secondary: #a855f7;
+        --bg-dark: #0d1117;
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --text-muted: #94a3b8;
+    }
+
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
-        background-color: #0d1117;
+        color: #f8fafc;
     }
     
     .stApp {
-        background: radial-gradient(circle at top right, #1e293b, #0f172a);
+        background: radial-gradient(circle at 20% 10%, rgba(99, 102, 241, 0.15), transparent),
+                    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15), transparent),
+                    #0f172a;
     }
     
     .main-header {
-        background: linear-gradient(90deg, #6366f1, #a855f7);
+        font-family: 'Outfit', sans-serif;
+        background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 800;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0px;
+        letter-spacing: -1px;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     .card {
-        background: rgba(30, 41, 59, 0.7);
-        backdrop-filter: blur(10px);
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
+        border-radius: 20px;
         padding: 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        margin-bottom: 24px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        transition: transform 0.3s ease, border 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        border: 1px solid rgba(99, 102, 241, 0.4);
     }
     
     .stButton>button {
         width: 100%;
-        background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
         border: none;
-        padding: 12px;
+        padding: 14px;
         border-radius: 12px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
+        letter-spacing: 1.5px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     }
     
     .stButton>button:hover {
-        transform: scale(1.02);
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        transform: scale(1.02) translateY(-2px);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+    }
+
+    .stButton>button:active {
+        transform: scale(0.98);
+    }
+
+    /* Intelligence Trace Pulse */
+    .log-pulse {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+    }
+
+    /* Status Badges */
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -108,7 +172,7 @@ with st.sidebar:
         st.session_state['vpm_logs'] = ["System initialized. Waiting for input..."]
     
     for log in reversed(st.session_state['vpm_logs'][-5:]):
-        st.caption(f"🕒 {log}")
+        st.markdown(f'<p class="log-pulse" style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 5px;">🕒 {log}</p>', unsafe_allow_html=True)
 
     if 'vpm_scope' in st.session_state:
         st.divider()
@@ -119,11 +183,11 @@ with st.sidebar:
         st.progress(score / 100)
         st.write(f"Confidence: **{score}%**")
         if score > 80:
-            st.success("Ready for Development")
+            st.markdown('<span class="badge" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4);">Ready for Development</span>', unsafe_allow_html=True)
         elif score > 50:
-            st.warning("Needs More Detail")
+            st.markdown('<span class="badge" style="background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4);">Needs More Detail</span>', unsafe_allow_html=True)
         else:
-            st.error("High Risk - Gaps Found")
+            st.markdown('<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);">High Risk - Gaps Found</span>', unsafe_allow_html=True)
 
 
 if not auth_ok:
