@@ -209,18 +209,37 @@ st.markdown("""
         border-bottom: none !important;
     }
 
-    /* Expander Styling */
-    .streamlit-expanderHeader {
-        background-color: rgba(30, 41, 59, 0.4) !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    /* Global Variable Force */
+    :root {
+        --st-colors-background: #0f172a !important;
+        --st-colors-text: #f8fafc !important;
+        --st-colors-primary: #6366f1 !important;
     }
 
-    .streamlit-expanderContent {
-        background-color: rgba(15, 23, 42, 0.3) !important;
-        border-radius: 0 0 10px 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-top: none !important;
+    /* Expander Dark Force - Target all internal elements */
+    [data-testid="stExpander"], [data-testid="stExpander"] * {
+        background-color: transparent !important;
+        color: #f8fafc !important;
+    }
+    
+    [data-testid="stExpander"] {
+        background-color: rgba(30, 41, 59, 0.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+    }
+
+    /* File Uploader Browse Button */
+    [data-testid="stFileUploader"] button, 
+    [data-testid="stFileUploader"] button * {
+        background-color: #6366f1 !important;
+        color: white !important;
+    }
+
+    /* Selectbox Sidebar Force */
+    [data-testid="stSidebar"] [data-baseweb="select"],
+    [data-testid="stSidebar"] [data-baseweb="select"] * {
+        background-color: #1e293b !important;
+        color: white !important;
     }
 
     /* Status Badges */
@@ -231,6 +250,7 @@ st.markdown("""
         font-size: 0.8rem;
         font-weight: 600;
         text-transform: uppercase;
+        color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
