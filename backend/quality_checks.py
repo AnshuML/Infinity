@@ -32,29 +32,23 @@ def check_scope(scope):
 def check_framework(framework):
     issues = []
     # Reference glossary for common web/app pages
-    glossary = {"home", "products", "services", "dashboard", "contact", "about", "pricing", "login", "signup"}
+    glossary = {"home", "products", "services", "dashboard", "contact", "about", "pricing", "login", "signup", "mens", "womens", "faq", "shipping"}
     
-    if not framework.sitemap:
-        issues.append("Sitemap/Navigation hierarchy is empty")
-    if not framework.page_details:
-        issues.append("Page-by-page detailing is missing")
+    if not getattr(framework, 'header_nav', None):
+        issues.append("Header Navigation hierarchy is empty")
+    if not getattr(framework, 'footer_nav', None):
+        issues.append("Footer Navigation hierarchy is empty")
+    if not getattr(framework, 'website_assets', None):
+        issues.append("Website Assets list is empty")
     if not framework.cta_strategy or len(framework.cta_strategy) < 10:
         issues.append("CTA (Call to Action) strategy is weak or missing")
     
-    pages = {str(getattr(item, "page", "")).lower() for item in framework.sitemap}
+    pages = {str(getattr(item, "main_nav", "")).lower() for item in getattr(framework, 'header_nav', [])}
     coverage = len(pages & glossary) / max(1, len(glossary))
     
-    # Check if every sitemap page has a corresponding detail
-    detailed_pages = {str(getattr(item, "page", "")).lower() for item in framework.page_details}
-    missing_details = pages - detailed_pages
-    if missing_details:
-        issues.append(f"Missing details for pages: {', '.join(missing_details)}")
-
     return {
         "complete": len(issues) == 0,
         "issues": issues,
         "glossary_coverage": round(coverage, 2),
         "status": "PASS" if len(issues) == 0 else "WARNING"
     }
-
-

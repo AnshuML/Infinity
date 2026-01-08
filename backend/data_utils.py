@@ -2,6 +2,8 @@ import docx
 import pandas as pd
 import os
 
+import PyPDF2
+
 def read_docx(file_path):
     doc = docx.Document(file_path)
     full_text = []
@@ -9,10 +11,21 @@ def read_docx(file_path):
         full_text.append(para.text)
     return "\n".join(full_text)
 
+def read_pdf(file_path):
+    text = ""
+    with open(file_path, "rb") as f:
+        reader = PyPDF2.PdfReader(f)
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+    return text
+
 def read_xlsx(file_path):
-    df = pd.read_excel(file_path)
-    # Convert dataframe to a string representation for the LLM
-    return df.to_string()
+    xl = pd.ExcelFile(file_path)
+    combined_text = []
+    for sheet_name in xl.sheet_names:
+        df = pd.read_excel(file_path, sheet_name=sheet_name)
+        combined_text.append(f"--- Sheet: {sheet_name} ---\n{df.to_string()}")
+    return "\n\n".join(combined_text)
 
 def get_examples(data_dir):
     examples = []

@@ -40,17 +40,26 @@ def framework_to_markdown(framework):
     lines = []
     lines.append("# CONTENT FRAMEWORK")
     lines.append("")
-    lines.append("## Sitemap")
-    for s in framework.sitemap:
-        page = getattr(s, 'page', 'Unknown')
-        desc = getattr(s, 'description', '')
-        lines.append(f"- {page}: {desc}")
+    lines.append("## 1. Header Navigation")
+    lines.append("| Main Nav | Dropdown | Destination | Type | Description | Content Type |")
+    lines.append("|----------|----------|-------------|------|-------------|--------------|")
+    for item in framework.header_nav:
+        lines.append(f"| {item.main_nav} | {item.dropdown} | {item.final_destination} | {item.page_type} | {item.page_description} | {item.content_type} |")
+    
     lines.append("")
-    lines.append("## Page Requirements")
-    for p in framework.page_details:
-        page = getattr(p, 'page', 'Unknown')
-        req = getattr(p, 'requirements', '')
-        lines.append(f"- {page}: {req}")
+    lines.append("## 2. Footer Navigation")
+    lines.append("| Menu Title | Nested Items | Type | Description | Content Type |")
+    lines.append("|------------|--------------|------|-------------|--------------|")
+    for item in framework.footer_nav:
+        lines.append(f"| {item.menu_title} | {item.nested_items} | {item.page_type} | {item.page_description} | {item.content_type} |")
+    
+    lines.append("")
+    lines.append("## 3. Website Assets")
+    lines.append("| Asset Required | Description | Content Type |")
+    lines.append("|----------------|-------------|--------------|")
+    for item in framework.website_assets:
+        lines.append(f"| {item.asset_required} | {item.description} | {item.content_type} |")
+        
     lines.append("")
     lines.append("## CTA Strategy")
     lines.append(framework.cta_strategy)
