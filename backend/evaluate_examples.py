@@ -16,7 +16,7 @@ def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
     b = b.flatten()
     na = np.linalg.norm(a) + 1e-8
     nb = np.linalg.norm(b) + 1e-8
-    return float(np.dot(a, b) / (na * nb))
+    return float(np.dot(a, b) / (na * nb))#cosine similarity formula
 
 
 def token_overlap(a: str, b: str) -> float:
@@ -26,16 +26,20 @@ def token_overlap(a: str, b: str) -> float:
         return 0.0
     inter = len(ta & tb)
     union = len(ta | tb)
-    return inter / union
+    return inter / union #overlap
 
 
 def evaluate_example(name: str, input_text: str, expected_text: str, processor: AIProcessor, engine: ValidationEngine, out_dir: str, auto_ref: bool = False) -> Tuple[float, float]:
-    refs = engine.validate_content(input_text, n_results=1)
+    refs = engine.validate_content(input_text, n_results=3)
     ref_context = "\n\n".join(refs)
 
     scope = processor.generate_scope(input_text, ref_context)
     framework = processor.generate_framework(scope, input_text, ref_context)
 
+    # Import Excel export utilities
+    from export_utils_excel import framework_to_excel, scope_to_excel
+    from export_utils import scope_to_markdown, framework_to_markdown
+    
     scope_md = scope_to_markdown(scope)
     framework_md = framework_to_markdown(framework)
 
@@ -47,16 +51,32 @@ def evaluate_example(name: str, input_text: str, expected_text: str, processor: 
     with open(os.path.join(out_dir, "expected.txt"), "w", encoding="utf-8") as f:
         f.write(expected_text)
 
+    # Generate Excel and convert to text for comparison
+    try:
+        framework_excel_bytes = framework_to_excel(framework)
+        excel_path = os.path.join(out_dir, "generated_framework.xlsx")
+        with open(excel_path, 'wb') as f:
+            f.write(framework_excel_bytes)
+        
+        # Read the generated Excel as text for embedding comparison
+        import pandas as pd
+        from data_utils import read_xlsx
+        gen_text = read_xlsx(excel_path)
+    except Exception as e:
+        print(f"  Warning: Excel generation failed ({e}), using markdown fallback")
+        gen_text = scope_md + "\n\n" + framework_md
+
     if auto_ref:
         kb_expected = engine.find_best_expected_output(input_text) or ""
-        gen_text = kb_expected
+        comparison_text = kb_expected
     else:
-        gen_text = scope_md + "\n\n" + framework_md
-    emb_gen = engine.get_embedding(gen_text)
+        comparison_text = gen_text
+        
+    emb_gen = engine.get_embedding(comparison_text)
     emb_exp = engine.get_embedding(expected_text)
 
     cos = cosine_sim(emb_gen, emb_exp)
-    overlap = token_overlap(gen_text, expected_text)
+    overlap = token_overlap(comparison_text, expected_text)
 
     with open(os.path.join(out_dir, "metrics.json"), "w", encoding="utf-8") as f:
         json.dump({"cosine_similarity": cos, "token_overlap": overlap}, f, indent=2)

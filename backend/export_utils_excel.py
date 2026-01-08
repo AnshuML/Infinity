@@ -78,9 +78,9 @@ def get_header_nav_excel(framework):
             'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
             'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
             'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-            '🔗 CONTENT LINK': '',
-            '📝 STATUS': '⏳ Not Started',
-            '💬 CLIENT NOTES': ''
+            '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
+            '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
+            '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -99,9 +99,9 @@ def get_footer_nav_excel(framework):
             'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
             'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
             'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-            '🔗 CONTENT LINK': '',
-            '📝 STATUS': '⏳ Not Started',
-            '💬 CLIENT NOTES': ''
+            '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
+            '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
+            '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -117,9 +117,9 @@ def get_website_assets_excel(framework):
             'ASSETS REQUIRED': _clean_val(getattr(item, 'asset_required', '')),
             'DESCRIPTION': _clean_val(getattr(item, 'description', '')),
             'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-            '🔗 CONTENT LINK': '',
-            '📝 STATUS': '⏳ Not Started',
-            '💬 CLIENT NOTES': ''
+            '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
+            '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
+            '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -141,9 +141,9 @@ def framework_to_excel(framework):
                 'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
                 'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
                 'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-                '🔗 CONTENT LINK': '',
-                '📝 STATUS': '⏳ Not Started',
-                '💬 CLIENT NOTES': ''
+                '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
+                '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
+                '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
             })
         df_h = pd.DataFrame(h_data)
         df_h.to_excel(writer, sheet_name='header navigation content', index=False, startrow=1)
@@ -159,9 +159,9 @@ def framework_to_excel(framework):
                 'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
                 'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
                 'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-                '🔗 CONTENT LINK': '',
-                '📝 STATUS': '⏳ Not Started',
-                '💬 CLIENT NOTES': ''
+                '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
+                '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
+                '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
             })
         df_f = pd.DataFrame(f_data)
         df_f.to_excel(writer, sheet_name='footer navigation content', index=False, startrow=1)
@@ -174,9 +174,9 @@ def framework_to_excel(framework):
                 'ASSETS REQUIRED': _clean_val(getattr(item, 'asset_required', '')),
                 'DESCRIPTION': _clean_val(getattr(item, 'description', '')),
                 'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-                '🔗 CONTENT LINK': '',
-                '📝 STATUS': '⏳ Not Started',
-                '💬 CLIENT NOTES': ''
+                '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
+                '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
+                '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
             })
         df_a = pd.DataFrame(a_data)
         df_a.to_excel(writer, sheet_name='website assets', index=False, startrow=1)
@@ -194,7 +194,8 @@ def scope_to_excel(scope):
         ['In-Scope', "\n".join(scope.scope_in)],
         ['Out-of-Scope', "\n".join(scope.scope_out)],
         ['Navigation Structure', "\n".join(scope.navigation)],
-        ['Gap Analysis', "\n".join(scope.gap_analysis)]
+        ['Gap Analysis', "\n".join(scope.gap_analysis)],
+        ['Strategic Recommendations', "\n".join(getattr(scope, 'strategic_recommendations', []))]
     ]
     df_overview = pd.DataFrame(overview_data[1:], columns=overview_data[0])
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
