@@ -381,7 +381,8 @@ You are a Virtual Project Manager. Generate a comprehensive content framework.
 - GENERATE MINIMUM 8-12 HEADER NAV ITEMS.
 - GENERATE MINIMUM 5-8 FOOTER NAV ITEMS.
 - GENERATE MINIMUM 6-10 WEBSITE ASSETS.
-- FILL ALL FIELDS. NO EMPTY STRINGS.
+- FILL ALL FIELDS. "key_sections" MUST have 3-5 specific bullet points. NO EMPTY STRINGS.
+- "page_description" MUST be at least 15 words.
 
 INSTRUCTIONS:
 1. Study the Reference Examples and match their structure and depth.

@@ -185,6 +185,32 @@ def framework_to_excel(framework):
     output.seek(0)
     return output.getvalue()
 
+def get_blank_framework_excel():
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        # Define columns
+        h_cols = ['MAIN NAV. ITEM/LAUNCH POINT', 'DROPDOWN/NEXT STOP', 'FINAL DESTINATION', 'PAGE TYPE', 'PAGE DESCRIPTION', 'KEY SECTIONS/FEATURES', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
+        f_cols = ['FOOTER MENU TITLE', 'NESTED MENU ITEMS', 'PAGE TYPE', 'PAGE DESCRIPTION', 'KEY SECTIONS/FEATURES', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
+        a_cols = ['ASSETS REQUIRED', 'DESCRIPTION', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
+
+        # Create empty DataFrames
+        df_h = pd.DataFrame(columns=h_cols)
+        df_f = pd.DataFrame(columns=f_cols)
+        df_a = pd.DataFrame(columns=a_cols)
+
+        # Write to sheets
+        df_h.to_excel(writer, sheet_name='header navigation content', index=False, startrow=1)
+        _apply_standard_styling(writer.book['header navigation content'], df_h, "1️⃣ HEADER NAVIGATION ITEMS")
+
+        df_f.to_excel(writer, sheet_name='footer navigation content', index=False, startrow=1)
+        _apply_standard_styling(writer.book['footer navigation content'], df_f, "2️⃣ FOOTER NAVIGATION ITEMS")
+
+        df_a.to_excel(writer, sheet_name='website assets', index=False, startrow=1)
+        _apply_standard_styling(writer.book['website assets'], df_a, "3️⃣ WEBSITE ASSETS")
+
+    output.seek(0)
+    return output.getvalue()
+
 def scope_to_excel(scope):
     output = BytesIO()
     overview_data = [

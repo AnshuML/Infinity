@@ -32,7 +32,7 @@ def get_example_paths(data_dir):
                 "output_files": output_files
             })
     return out
-from export_utils_excel import framework_to_excel, scope_to_excel, get_header_nav_excel, get_footer_nav_excel, get_website_assets_excel
+from export_utils_excel import framework_to_excel, scope_to_excel, get_header_nav_excel, get_footer_nav_excel, get_website_assets_excel, get_blank_framework_excel
 from quality_checks import check_scope, check_framework
 
 def safe_get_attr(obj, attr, default="Unknown"):
@@ -545,8 +545,12 @@ else:
                             st.download_button("3. Website Assets", get_website_assets_excel(frame), file_name="website assets.xlsx")
                         
                         st.divider()
-                        # Also keep single file option for convenience
-                        st.download_button("Download All-in-One Framework", framework_to_excel(frame), file_name="complete_content_framework.xlsx")
+                        col_d1, col_d2 = st.columns(2)
+                        with col_d1:
+                             st.download_button("Download All-in-One Framework", framework_to_excel(frame), file_name="complete_content_framework.xlsx")
+                        with col_d2:
+                             st.download_button("Download Blank Template (Headers Only)", get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
+
                             
                         qc_fw = check_framework(frame)
                         with st.expander(" Framework Quality Checks", expanded=False):
@@ -587,6 +591,7 @@ else:
                             st.error(f"Feedback processing failed: {e}")
                 else:
                     st.info("Content Framework detailing navigation and page modules will appear here.")
+                    st.download_button("Download Blank Template (Headers Only)", get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
 
     with tab3:
         st.write("### 📚 Strategic Knowledge Base & Exact Export")
