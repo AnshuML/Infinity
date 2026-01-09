@@ -486,28 +486,28 @@ else:
                     f_tab1, f_tab2, f_tab3 = st.tabs(["Header Nav", "Footer Nav", "Assets"])
                     with f_tab1:
                         st.table([{
-                            "Main Nav": i.main_nav, 
-                            "Dropdown": i.dropdown, 
-                            "Destination": i.final_destination, 
-                            "Type": i.page_type,
-                            "Link": i.content_link,
-                            "Status": i.status
+                            "Main Nav": safe_get_attr(i, 'main_nav'), 
+                            "Dropdown": safe_get_attr(i, 'dropdown'), 
+                            "Destination": safe_get_attr(i, 'final_destination'), 
+                            "Type": safe_get_attr(i, 'page_type'),
+                            "Link": safe_get_attr(i, 'content_link'),
+                            "Status": safe_get_attr(i, 'status')
                         } for i in frame.header_nav])
                     with f_tab2:
                         st.table([{
-                            "Menu": i.menu_title, 
-                            "Items": i.nested_items, 
-                            "Type": i.page_type,
-                            "Link": i.content_link,
-                            "Status": i.status
+                            "Menu": safe_get_attr(i, 'menu_title'), 
+                            "Items": safe_get_attr(i, 'nested_items'), 
+                            "Type": safe_get_attr(i, 'page_type'),
+                            "Link": safe_get_attr(i, 'content_link'),
+                            "Status": safe_get_attr(i, 'status')
                         } for i in frame.footer_nav])
                     with f_tab3:
                         st.table([{
-                            "Asset": i.asset_required, 
-                            "Type": i.content_type,
-                            "Link": i.content_link,
-                            "Status": i.status,
-                            "Notes": i.client_notes
+                            "Asset": safe_get_attr(i, 'asset_required'), 
+                            "Type": safe_get_attr(i, 'content_type'),
+                            "Link": safe_get_attr(i, 'content_link'),
+                            "Status": safe_get_attr(i, 'status'),
+                            "Notes": safe_get_attr(i, 'client_notes')
                         } for i in frame.website_assets])
 
                     try:
