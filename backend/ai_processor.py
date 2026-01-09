@@ -376,8 +376,8 @@ Reference Examples:
 You are a Virtual Project Manager. Generate a comprehensive content framework.
 
 🚨 CRITICAL OUTPUT RULES:
-- Return ONLY valid JSON. Start with {{ and end with }}
-- NO markdown code blocks.
+- Return ONLY valid JSON. Start with { and end with }
+- NO markdown code blocks. NO reports. NO introductory text.
 - GENERATE MINIMUM 8-12 HEADER NAV ITEMS.
 - GENERATE MINIMUM 5-8 FOOTER NAV ITEMS.
 - GENERATE MINIMUM 6-10 WEBSITE ASSETS.
@@ -389,8 +389,6 @@ INSTRUCTIONS:
 2. Identify ALL pages, navigation items, and assets comprehensively.
 3. Be EXTREMELY detailed. Do not summarize.
 
-{format_instructions}
-
 SCOPE:
 {scope}
 
@@ -399,12 +397,18 @@ ORIGINAL NOTES:
 
 REFERENCE EXAMPLES:
 {context}
-        """
+
+REQUIRED FORMAT (STRICT JSON ONLY):
+{format_instructions}
+
+FINAL CHECK: Ensure the output is PURE JSON using the format above. No text before or after.
+"""
         prompt = PromptTemplate(
             template=template,
             input_variables=["scope", "raw_text", "context", "format_instructions"],
         )
         return self._run_raw(prompt, {"scope": scope.json(), "raw_text": self.truncate_text(raw_text, 2000), "context": safe_context, "format_instructions": SIMPLIFIED_FRAMEWORK_FORMAT}, self.framework_parser)
+
 
     def merge_scopes(self, a: ScopeDocument, b: ScopeDocument) -> ScopeDocument:
         def dedupe(x):
