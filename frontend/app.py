@@ -32,6 +32,23 @@ def get_example_paths(data_dir):
                 "output_files": output_files
             })
     return out
+import pandas as pd
+from io import BytesIO
+
+def get_blank_framework_excel():
+    output = BytesIO()
+    # Minimal implementation to avoid dependency on updated backend
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        h_cols = ['MAIN NAV. ITEM/LAUNCH POINT', 'DROPDOWN/NEXT STOP', 'FINAL DESTINATION', 'PAGE TYPE', 'PAGE DESCRIPTION', 'KEY SECTIONS/FEATURES', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
+        pd.DataFrame(columns=h_cols).to_excel(writer, sheet_name='header navigation content', index=False)
+        f_cols = ['FOOTER MENU TITLE', 'NESTED MENU ITEMS', 'PAGE TYPE', 'PAGE DESCRIPTION', 'KEY SECTIONS/FEATURES', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
+        pd.DataFrame(columns=f_cols).to_excel(writer, sheet_name='footer navigation content', index=False)
+        a_cols = ['ASSETS REQUIRED', 'DESCRIPTION', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
+        pd.DataFrame(columns=a_cols).to_excel(writer, sheet_name='website assets', index=False)
+    output.seek(0)
+    output.seek(0)
+    return output.getvalue()
+
 import export_utils_excel as eu
 from quality_checks import check_scope, check_framework
 
@@ -549,7 +566,7 @@ else:
                         with col_d1:
                              st.download_button("Download All-in-One Framework", eu.framework_to_excel(frame), file_name="complete_content_framework.xlsx")
                         with col_d2:
-                             st.download_button("Download Blank Template (Headers Only)", eu.get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
+                             st.download_button("Download Blank Template (Headers Only)", get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
 
                             
                         qc_fw = check_framework(frame)
@@ -591,7 +608,7 @@ else:
                             st.error(f"Feedback processing failed: {e}")
                 else:
                     st.info("Content Framework detailing navigation and page modules will appear here.")
-                    st.download_button("Download Blank Template (Headers Only)", eu.get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
+                    st.download_button("Download Blank Template (Headers Only)", get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
 
     with tab3:
         st.write("### 📚 Strategic Knowledge Base & Exact Export")

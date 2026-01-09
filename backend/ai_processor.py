@@ -136,10 +136,10 @@ class WebsiteAsset(BaseModel):
     client_notes: Optional[str] = Field("", description="Additional notes or feedback from the client")
 
 class ContentFramework(BaseModel):
-    header_nav: list[HeaderNavItem] = Field(description="Items for the Header Navigation tab")
-    footer_nav: list[FooterNavItem] = Field(description="Items for the Footer Navigation tab")
-    website_assets: list[WebsiteAsset] = Field(description="Items for the Website Assets tab")
-    cta_strategy: str = Field(description="Recommended call-to-action strategy for the entire site")
+    header_nav: list[HeaderNavItem] = Field(default_factory=list, description="Items for the Header Navigation tab")
+    footer_nav: list[FooterNavItem] = Field(default_factory=list, description="Items for the Footer Navigation tab")
+    website_assets: list[WebsiteAsset] = Field(default_factory=list, description="Items for the Website Assets tab")
+    cta_strategy: str = Field(default="", description="Recommended call-to-action strategy for the entire site")
 
 class AIProcessor:
     def __init__(self, provider: str = "groq", groq_api_key: str = None, google_api_key: str = None):
