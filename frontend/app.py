@@ -492,60 +492,62 @@ else:
                         st.info(f" **CTA Strategy:** {frame.cta_strategy}")
 
                     st.write("###  Visual Architecture")
-                    try:
-                        import graphviz
-                        dot = graphviz.Digraph(comment='Sitemap')
-                        dot.attr(rankdir='LR', size='8,5', bgcolor='transparent')
-                        dot.attr('node', shape='rectangle', style='filled,rounded', color='#6366f1', fontcolor='white', fontname='Inter', fontsize='12')
-                        dot.attr('edge', color='#94a3b8', arrowhead='vee')
-                        
-                        root_name = f"Project: {st.session_state['vpm_scope'].project_title}"
-                        dot.node('ROOT', root_name, color='#a855f7', shape='doubleoctagon')
-                        
-                        for i, item in enumerate(frame.header_nav):
-                            p_name = safe_get_attr(item, 'main_nav')
-                            destination = safe_get_attr(item, 'final_destination')
-                            node_id = f"page_{i}"
-                            dot.node(node_id, p_name)
-                            dot.edge('ROOT', node_id)
-                            if destination and destination != p_name:
-                                dest_id = f"dest_{i}"
-                                dot.node(dest_id, destination)
-                                dot.edge(node_id, dest_id)
+                    if frame:
+                        try:
+                            import graphviz
+                            dot = graphviz.Digraph(comment='Sitemap')
+                            dot.attr(rankdir='LR', size='8,5', bgcolor='transparent')
+                            dot.attr('node', shape='rectangle', style='filled,rounded', color='#6366f1', fontcolor='white', fontname='Inter', fontsize='12')
+                            dot.attr('edge', color='#94a3b8', arrowhead='vee')
                             
-                        st.graphviz_chart(dot)
-                    except Exception as g_err:
-                        st.info("Visual architecture graph is preparing...")
+                            root_name = f"Project: {st.session_state['vpm_scope'].project_title}"
+                            dot.node('ROOT', root_name, color='#a855f7', shape='doubleoctagon')
+                            
+                            for i, item in enumerate(frame.header_nav):
+                                p_name = safe_get_attr(item, 'main_nav')
+                                destination = safe_get_attr(item, 'final_destination')
+                                node_id = f"page_{i}"
+                                dot.node(node_id, p_name)
+                                dot.edge('ROOT', node_id)
+                                if destination and destination != p_name:
+                                    dest_id = f"dest_{i}"
+                                    dot.node(dest_id, destination)
+                                    dot.edge(node_id, dest_id)
+                                    
+                            st.graphviz_chart(dot)
+                        except Exception as g_err:
+                            st.info("Visual architecture graph is preparing...")
                     
                     st.write("### 🗂️ Content Structure")
-                    f_tab1, f_tab2, f_tab3 = st.tabs(["Header Nav", "Footer Nav", "Assets"])
-                    with f_tab1:
-                        st.table([{
-                            "Main Nav": safe_get_attr(i, 'main_nav'), 
-                            "Dropdown": safe_get_attr(i, 'dropdown'), 
-                            "Destination": safe_get_attr(i, 'final_destination'), 
-                            "Type": safe_get_attr(i, 'page_type'),
-                            "Link": safe_get_attr(i, 'content_link'),
-                            "Status": safe_get_attr(i, 'status')
-                        } for i in frame.header_nav])
-                    with f_tab2:
-                        st.table([{
-                            "Menu": safe_get_attr(i, 'menu_title'), 
-                            "Items": safe_get_attr(i, 'nested_items'), 
-                            "Type": safe_get_attr(i, 'page_type'),
-                            "Link": safe_get_attr(i, 'content_link'),
-                            "Status": safe_get_attr(i, 'status')
-                        } for i in frame.footer_nav])
-                    with f_tab3:
-                        st.table([{
-                            "Asset": safe_get_attr(i, 'asset_required'), 
-                            "Type": safe_get_attr(i, 'content_type'),
-                            "Link": safe_get_attr(i, 'content_link'),
-                            "Status": safe_get_attr(i, 'status'),
-                            "Notes": safe_get_attr(i, 'client_notes')
-                        } for i in frame.website_assets])
+                    if frame:
+                        f_tab1, f_tab2, f_tab3 = st.tabs(["Header Nav", "Footer Nav", "Assets"])
+                        with f_tab1:
+                            st.table([{
+                                "Main Nav": safe_get_attr(i, 'main_nav'), 
+                                "Dropdown": safe_get_attr(i, 'dropdown'), 
+                                "Destination": safe_get_attr(i, 'final_destination'), 
+                                "Type": safe_get_attr(i, 'page_type'),
+                                "Link": safe_get_attr(i, 'content_link'),
+                                "Status": safe_get_attr(i, 'status')
+                            } for i in frame.header_nav])
+                        with f_tab2:
+                            st.table([{
+                                "Menu": safe_get_attr(i, 'menu_title'), 
+                                "Items": safe_get_attr(i, 'nested_items'), 
+                                "Type": safe_get_attr(i, 'page_type'),
+                                "Link": safe_get_attr(i, 'content_link'),
+                                "Status": safe_get_attr(i, 'status')
+                            } for i in frame.footer_nav])
+                        with f_tab3:
+                            st.table([{
+                                "Asset": safe_get_attr(i, 'asset_required'), 
+                                "Type": safe_get_attr(i, 'content_type'),
+                                "Link": safe_get_attr(i, 'content_link'),
+                                "Status": safe_get_attr(i, 'status'),
+                                "Notes": safe_get_attr(i, 'client_notes')
+                            } for i in frame.website_assets])
 
-                    try:
+                    if frame:
                         st.write("### 📥 Download")
                         col1, col2, col3 = st.columns(3)
                         with col1:
@@ -560,7 +562,6 @@ else:
                         with col_d1:
                              st.download_button("Download All-in-One Framework", eu.framework_to_excel(frame), file_name="complete_content_framework.xlsx")
 
-                            
                         qc_fw = check_framework(frame)
                         with st.expander(" Framework Quality Checks", expanded=False):
                             st.write(f"Status: **{qc_fw['status']}**")
@@ -569,8 +570,6 @@ else:
                             if qc_fw['issues']:
                                 for i in qc_fw['issues']:
                                     st.markdown(f"- {i}")
-                    except Exception as e:
-                        st.error(f"Export failed: {e}")
                     
                     if 'vpm_reference_output' in st.session_state:
                         with st.expander("📎 Reference Output (from Knowledge Base)", expanded=False):
