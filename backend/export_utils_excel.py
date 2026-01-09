@@ -6,6 +6,8 @@ from openpyxl.utils import get_column_letter
 def _clean_val(val):
     if isinstance(val, list):
         return "\n".join([f"• {str(i)}" for i in val])
+    if isinstance(val, tuple):
+        return "\n".join([f"• {str(i)}" for i in val])
     return str(val) if val is not None else ""
 
 def _get(item, key, default=""):
