@@ -100,7 +100,31 @@ class ValidationEngine:
             return parts[1]
         return kb_content
 
-    def find_best_expected_output(self, text: str) -> str | None:
+    def find_best_match(self, text: str) -> dict | None:
+        """
+        Find the best-matching example by cosine similarity.
+        Returns the matching example dict (with 'content' key) if similarity > threshold.
+        """
+        if self.index.ntotal == 0:
+            return None
+        text_emb = self.get_embedding(text)
+        best_match = None
+        best_score = -1
+        for idx in range(min(5, self.index.ntotal)):
+            dist, i = self.index.search(text_emb, 1)
+            if i != -1:
+                doc = self.metadata[i]
+                score = float(1 - dist)  # cosine similarity
+                if score > best_score:
+                    best_score = score
+                    best_match = {
+                        "content": doc["content"],
+                        "name": doc["id"]
+                    }
+        # Threshold: only return match if similarity is reasonably high
+        if best_score > 0.85:
+            return best_match
+        return None
         best = self.find_best_match(text)
         if not best:
             return None

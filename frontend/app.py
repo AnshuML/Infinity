@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 from ai_processor import AIProcessor
 from validation_engine import ValidationEngine
 from data_utils import read_docx, read_pdf, read_xlsx
+from example_parser import match_example_by_input
 
 def get_example_paths(data_dir):
     out = []
@@ -481,20 +482,6 @@ else:
                             framework = processor.generate_framework(st.session_state['vpm_scope'], st.session_state['vpm_raw_input'], ref_context)
                             st.session_state['vpm_framework'] = framework
                             st.session_state['vpm_logs'].append("Visual architecture mapped successfully.")
-                            if reference_mode:
-                                st.session_state['vpm_logs'].append("Cross-referencing with exact match historical data...")
-                                best = engine.find_best_match(st.session_state['vpm_raw_input'])
-                                if best and best.get('content'):
-                                    st.session_state['vpm_reference_output'] = best['content']
-                        except Exception as e:
-                            st.error(f"Framework generation failed: {e}")
-                            st.session_state['vpm_logs'].append(f"ERROR: {str(e)}")
-            
-            with col_frame_b:
-                if 'vpm_framework' in st.session_state:
-                    frame = st.session_state['vpm_framework']
-                    st.success(" Content Framework Ready")
-                    
                     st.info(f" **CTA Strategy:** {frame.cta_strategy}")
 
                     st.write("###  Visual Architecture")
