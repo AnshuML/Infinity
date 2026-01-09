@@ -250,11 +250,25 @@ class AIProcessor:
                 if len(parts) >= 2:
                     content = parts[1].strip()
             
-            # ===== STRATEGY 2: Extract content between first { and last } =====
+            # ===== STRATEGY 2: Aggressively extract JSON between first { and last } =====
             first_brace = content.find('{')
             last_brace = content.rfind('}')
             if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
                 content = content[first_brace:last_brace+1]
+            else:
+                # If no braces found, try looking for any JSON-like pattern
+                import json as json_lib
+                try:
+                    # Fallback: try to find and parse any JSON object in the text
+                    import re
+                    json_match = re.search(r'\{[^{}]*\}', content)
+                    if json_match:
+                        parsed = json_lib.loads(json_match.group())
+                        if isinstance(parsed, dict):
+                            # Convert to JSON string for LangChain parser
+                            content = json_lib.dumps(parsed)
+                except Exception:
+                    pass
             
             # ===== STRATEGY 3: Clean up common LLM artifacts =====
             content = content.strip()
