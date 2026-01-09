@@ -240,6 +240,21 @@ class AIProcessor:
             res = active_llm.invoke(prompt)
             content = res.content
             
+            # ===== STRATEGY 0: Aggressive pre-cleaning before JSON extraction =====
+            import re
+            # Remove all markdown headings, emojis, and decorative lines
+            lines = content.split('\n')
+            cleaned_lines = []
+            for line in lines:
+                # Skip lines with markdown headings or emojis
+                if re.match(r'^#+\s+|^\s*[-*]{3,}', line) or re.search(r'[🏠🛍️📚🤔📞🖼️📸📝🔗💬🎯📋📄📢]', line):
+                    continue
+                # Skip empty lines
+                if not line.strip():
+                    continue
+                cleaned_lines.append(line.strip())
+            content = '\n'.join(cleaned_lines)
+            
             # ===== STRATEGY 1: Remove markdown code blocks =====
             if "```json" in content:
                 parts = content.split("```json")
