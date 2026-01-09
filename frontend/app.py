@@ -565,8 +565,6 @@ else:
                         col_d1, col_d2 = st.columns(2)
                         with col_d1:
                              st.download_button("Download All-in-One Framework", eu.framework_to_excel(frame), file_name="complete_content_framework.xlsx")
-                        with col_d2:
-                             st.download_button("Download Blank Template (Headers Only)", get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
 
                             
                         qc_fw = check_framework(frame)
@@ -608,7 +606,6 @@ else:
                             st.error(f"Feedback processing failed: {e}")
                 else:
                     st.info("Content Framework detailing navigation and page modules will appear here.")
-                    st.download_button("Download Blank Template (Headers Only)", get_blank_framework_excel(), file_name="blank_content_framework.xlsx")
 
     with tab3:
         st.write("### 📚 Strategic Knowledge Base & Exact Export")

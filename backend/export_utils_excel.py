@@ -8,6 +8,11 @@ def _clean_val(val):
         return "\n".join([f"• {str(i)}" for i in val])
     return str(val) if val is not None else ""
 
+def _get(item, key, default=""):
+    if isinstance(item, dict):
+        return item.get(key, default)
+    return getattr(item, key, default)
+
 def _apply_standard_styling(sheet, df, title_text):
     # Colors
     header_fill = PatternFill(start_color="000000", end_color="000000", fill_type="solid")
@@ -71,16 +76,16 @@ def get_header_nav_excel(framework):
     data = []
     for item in framework.header_nav:
         data.append({
-            'MAIN NAV. ITEM/LAUNCH POINT': _clean_val(getattr(item, 'main_nav', '')),
-            'DROPDOWN/NEXT STOP': _clean_val(getattr(item, 'dropdown', '')),
-            'FINAL DESTINATION': _clean_val(getattr(item, 'final_destination', '')),
-            'PAGE TYPE': _clean_val(getattr(item, 'page_type', '')),
-            'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
-            'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
-            'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-            '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
-            '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
-            '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
+            'MAIN NAV. ITEM/LAUNCH POINT': _clean_val(_get(item, 'main_nav', '')),
+            'DROPDOWN/NEXT STOP': _clean_val(_get(item, 'dropdown', '')),
+            'FINAL DESTINATION': _clean_val(_get(item, 'final_destination', '')),
+            'PAGE TYPE': _clean_val(_get(item, 'page_type', '')),
+            'PAGE DESCRIPTION': _clean_val(_get(item, 'page_description', '')),
+            'KEY SECTIONS/FEATURES': _clean_val(_get(item, 'key_sections', '')),
+            'CONTENT TYPE': _clean_val(_get(item, 'content_type', '')),
+            '🔗 CONTENT LINK': _clean_val(_get(item, 'content_link', '')),
+            '📝 STATUS': _clean_val(_get(item, 'status', '⏳ Not Started')),
+            '💬 CLIENT NOTES': _clean_val(_get(item, 'client_notes', ''))
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -93,15 +98,15 @@ def get_footer_nav_excel(framework):
     data = []
     for item in framework.footer_nav:
         data.append({
-            'FOOTER MENU TITLE': _clean_val(getattr(item, 'menu_title', '')),
-            'NESTED MENU ITEMS': _clean_val(getattr(item, 'nested_items', '')),
-            'PAGE TYPE': _clean_val(getattr(item, 'page_type', '')),
-            'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
-            'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
-            'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-            '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
-            '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
-            '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
+            'FOOTER MENU TITLE': _clean_val(_get(item, 'menu_title', '')),
+            'NESTED MENU ITEMS': _clean_val(_get(item, 'nested_items', '')),
+            'PAGE TYPE': _clean_val(_get(item, 'page_type', '')),
+            'PAGE DESCRIPTION': _clean_val(_get(item, 'page_description', '')),
+            'KEY SECTIONS/FEATURES': _clean_val(_get(item, 'key_sections', '')),
+            'CONTENT TYPE': _clean_val(_get(item, 'content_type', '')),
+            '🔗 CONTENT LINK': _clean_val(_get(item, 'content_link', '')),
+            '📝 STATUS': _clean_val(_get(item, 'status', '⏳ Not Started')),
+            '💬 CLIENT NOTES': _clean_val(_get(item, 'client_notes', ''))
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -114,12 +119,12 @@ def get_website_assets_excel(framework):
     data = []
     for item in framework.website_assets:
         data.append({
-            'ASSETS REQUIRED': _clean_val(getattr(item, 'asset_required', '')),
-            'DESCRIPTION': _clean_val(getattr(item, 'description', '')),
-            'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-            '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
-            '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
-            '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
+            'ASSETS REQUIRED': _clean_val(_get(item, 'asset_required', '')),
+            'DESCRIPTION': _clean_val(_get(item, 'description', '')),
+            'CONTENT TYPE': _clean_val(_get(item, 'content_type', '')),
+            '🔗 CONTENT LINK': _clean_val(_get(item, 'content_link', '')),
+            '📝 STATUS': _clean_val(_get(item, 'status', '⏳ Not Started')),
+            '💬 CLIENT NOTES': _clean_val(_get(item, 'client_notes', ''))
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -134,16 +139,16 @@ def framework_to_excel(framework):
         h_data = []
         for item in framework.header_nav:
             h_data.append({
-                'MAIN NAV. ITEM/LAUNCH POINT': _clean_val(getattr(item, 'main_nav', '')),
-                'DROPDOWN/NEXT STOP': _clean_val(getattr(item, 'dropdown', '')),
-                'FINAL DESTINATION': _clean_val(getattr(item, 'final_destination', '')),
-                'PAGE TYPE': _clean_val(getattr(item, 'page_type', '')),
-                'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
-                'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
-                'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-                '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
-                '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
-                '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
+                'MAIN NAV. ITEM/LAUNCH POINT': _clean_val(_get(item, 'main_nav', '')),
+                'DROPDOWN/NEXT STOP': _clean_val(_get(item, 'dropdown', '')),
+                'FINAL DESTINATION': _clean_val(_get(item, 'final_destination', '')),
+                'PAGE TYPE': _clean_val(_get(item, 'page_type', '')),
+                'PAGE DESCRIPTION': _clean_val(_get(item, 'page_description', '')),
+                'KEY SECTIONS/FEATURES': _clean_val(_get(item, 'key_sections', '')),
+                'CONTENT TYPE': _clean_val(_get(item, 'content_type', '')),
+                '🔗 CONTENT LINK': _clean_val(_get(item, 'content_link', '')),
+                '📝 STATUS': _clean_val(_get(item, 'status', '⏳ Not Started')),
+                '💬 CLIENT NOTES': _clean_val(_get(item, 'client_notes', ''))
             })
         df_h = pd.DataFrame(h_data)
         df_h.to_excel(writer, sheet_name='header navigation content', index=False, startrow=1)
@@ -153,15 +158,15 @@ def framework_to_excel(framework):
         f_data = []
         for item in framework.footer_nav:
             f_data.append({
-                'FOOTER MENU TITLE': _clean_val(getattr(item, 'menu_title', '')),
-                'NESTED MENU ITEMS': _clean_val(getattr(item, 'nested_items', '')),
-                'PAGE TYPE': _clean_val(getattr(item, 'page_type', '')),
-                'PAGE DESCRIPTION': _clean_val(getattr(item, 'page_description', '')),
-                'KEY SECTIONS/FEATURES': _clean_val(getattr(item, 'key_sections', '')),
-                'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-                '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
-                '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
-                '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
+                'FOOTER MENU TITLE': _clean_val(_get(item, 'menu_title', '')),
+                'NESTED MENU ITEMS': _clean_val(_get(item, 'nested_items', '')),
+                'PAGE TYPE': _clean_val(_get(item, 'page_type', '')),
+                'PAGE DESCRIPTION': _clean_val(_get(item, 'page_description', '')),
+                'KEY SECTIONS/FEATURES': _clean_val(_get(item, 'key_sections', '')),
+                'CONTENT TYPE': _clean_val(_get(item, 'content_type', '')),
+                '🔗 CONTENT LINK': _clean_val(_get(item, 'content_link', '')),
+                '📝 STATUS': _clean_val(_get(item, 'status', '⏳ Not Started')),
+                '💬 CLIENT NOTES': _clean_val(_get(item, 'client_notes', ''))
             })
         df_f = pd.DataFrame(f_data)
         df_f.to_excel(writer, sheet_name='footer navigation content', index=False, startrow=1)
@@ -171,12 +176,12 @@ def framework_to_excel(framework):
         a_data = []
         for item in framework.website_assets:
             a_data.append({
-                'ASSETS REQUIRED': _clean_val(getattr(item, 'asset_required', '')),
-                'DESCRIPTION': _clean_val(getattr(item, 'description', '')),
-                'CONTENT TYPE': _clean_val(getattr(item, 'content_type', '')),
-                '🔗 CONTENT LINK': _clean_val(getattr(item, 'content_link', '')),
-                '📝 STATUS': _clean_val(getattr(item, 'status', '⏳ Not Started')),
-                '💬 CLIENT NOTES': _clean_val(getattr(item, 'client_notes', ''))
+                'ASSETS REQUIRED': _clean_val(_get(item, 'asset_required', '')),
+                'DESCRIPTION': _clean_val(_get(item, 'description', '')),
+                'CONTENT TYPE': _clean_val(_get(item, 'content_type', '')),
+                '🔗 CONTENT LINK': _clean_val(_get(item, 'content_link', '')),
+                '📝 STATUS': _clean_val(_get(item, 'status', '⏳ Not Started')),
+                '💬 CLIENT NOTES': _clean_val(_get(item, 'client_notes', ''))
             })
         df_a = pd.DataFrame(a_data)
         df_a.to_excel(writer, sheet_name='website assets', index=False, startrow=1)
