@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 from ai_processor import AIProcessor
 from validation_engine import ValidationEngine
-from data_utils import read_docx, read_pdf, read_xlsx
+from data_utils import read_docx, read_pdf, read_xlsx, get_example_paths
 from export_utils_excel import framework_to_excel, scope_to_excel, get_header_nav_excel, get_footer_nav_excel, get_website_assets_excel
 from quality_checks import check_scope, check_framework
 
@@ -565,16 +565,35 @@ else:
                     st.info("Content Framework detailing navigation and page modules will appear here.")
 
     with tab3:
-        st.write("### 📚 Strategic Knowledge Base")
-        st.write("The Virtual Project Manager references these past successful projects to ensure consistency.")
+        st.write("### 📚 Strategic Knowledge Base & Exact Export")
+        st.write("Select an example to download the exact Output files as an All-in-One Frame.")
         try:
-            if hasattr(engine, 'metadata') and engine.metadata:
-                for idx, item in enumerate(engine.metadata):
-                    doc_id = item.get("id", "Unknown")
-                    content = item.get("content", "")
-                    with st.expander(f"📁 {doc_id}"):
-                        st.text_area("Stored Mapping (Input -> Output)", content, height=300, disabled=True, key=f"kb_item_{idx}")
+            data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
+            examples = get_example_paths(data_dir)
+            names = [ex['name'] for ex in examples]
+            if names:
+                name = st.selectbox("Example", names)
+                selected = next(ex for ex in examples if ex['name'] == name)
+                input_files = selected['input_files']
+                output_files = selected['output_files']
+                with st.expander("📄 Inputs", expanded=False):
+                    for f in input_files:
+                        st.markdown(f"- {os.path.basename(f)}")
+                import io, zipfile
+                def make_zip(paths):
+                    bio = io.BytesIO()
+                    with zipfile.ZipFile(bio, 'w', zipfile.ZIP_DEFLATED) as z:
+                        for p in paths:
+                            if os.path.isfile(p):
+                                z.write(p, arcname=os.path.basename(p))
+                    bio.seek(0)
+                    return bio.getvalue()
+                if output_files:
+                    zip_bytes = make_zip(output_files)
+                    st.download_button("Download All-in-One Frame (Exact Output ZIP)", zip_bytes, file_name=f"{name}_Output.zip")
+                else:
+                    st.info("No output files found for this example.")
             else:
-                st.info("Knowledge base is empty. Please run the ingestion script to load training data.")
+                st.info("No examples found in data folder.")
         except Exception as e:
             st.error(f"Error: {e}")
