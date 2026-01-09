@@ -252,6 +252,9 @@ class AIProcessor:
                 # Skip empty lines
                 if not line.strip():
                     continue
+                # Skip lines that look like table headers or separators
+                if re.match(r'^\s*(-+|\|+|\s*\|)', line):
+                    continue
                 cleaned_lines.append(line.strip())
             content = '\n'.join(cleaned_lines)
             
