@@ -176,18 +176,16 @@ class AIProcessor:
         return text
 
     def _run_raw(self, prompt_template, inputs, parser, is_retry=False, use_fallback=False):
-        """Runs LLM raw and then parses, with recovery"""
+        """Runs LLM raw and then parses, with recovery and aggressive JSON extraction"""
         prompt = prompt_template.format(**inputs)
         
         # Create a fresh LLM instance for the call to avoid shared state issues
-        # and ensure we aren't using a decommissioned default model
         active_llm = self.llm
         if use_fallback:
             active_llm = self.fallback_llm
             
         try:
-            # Explicitly check for llama-3.1-70b-versatile in the active_llm
-            # This is a safety check in case LangChain is using a default
+            # Explicitly check for deprecated models
             if hasattr(active_llm, 'model_name') and active_llm.model_name == "llama-3.1-70b-versatile":
                 active_llm.model_name = "llama-3.3-70b-versatile"
             if hasattr(active_llm, 'model') and active_llm.model == "llama-3.1-70b-versatile":
@@ -196,37 +194,90 @@ class AIProcessor:
             res = active_llm.invoke(prompt)
             content = res.content
             
-            # AGGRESSIVE JSON EXTRACTION
-            # Strip markdown code blocks
+            # ===== STRATEGY 1: Remove markdown code blocks =====
             if "```json" in content:
-                content = content.split("```json")[1].split("```")[0].strip()
+                parts = content.split("```json")
+                if len(parts) > 1:
+                    content = parts[1].split("```")[0].strip()
             elif "```" in content:
-                content = content.split("```")[1].split("```")[0].strip()
+                parts = content.split("```")
+                if len(parts) >= 2:
+                    content = parts[1].strip()
             
-            # Remove any leading headers, bullets, or markdown before the JSON
-            # Find the first { and last }
+            # ===== STRATEGY 2: Extract content between first { and last } =====
             first_brace = content.find('{')
             last_brace = content.rfind('}')
             if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
                 content = content[first_brace:last_brace+1]
             
-            # Detect if model returned a schema instead of instance
-            if '"properties":' in content or '"$defs":' in content or '"required": [' in content:
-                if not is_retry:
-                    return self._run_raw(prompt_template, inputs, parser, is_retry=True, use_fallback=True)
+            # ===== STRATEGY 3: Clean up common LLM artifacts =====
+            # Remove text before JSON starts
+            content = content.strip()
+            if content and not content.startswith('{'):
+                # Try to find where JSON actually starts
+                json_start = content.find('{')
+                if json_start > 0:
+                    content = content[json_start:]
             
+            # Remove text after JSON ends
+            if content and not content.endswith('}'):
+                json_end = content.rfind('}')
+                if json_end > 0:
+                    content = content[:json_end+1]
+            
+            # ===== STRATEGY 4: Detect schema regurgitation =====
+            # If LLM returned schema definition instead of data
+            schema_indicators = ['"properties":', '"$defs":', '"definitions":', '"type": "object"']
+            is_schema = any(indicator in content for indicator in schema_indicators)
+            
+            if is_schema and not is_retry:
+                print("⚠️ LLM returned schema instead of data. Retrying with fallback model...")
+                return self._run_raw(prompt_template, inputs, parser, is_retry=True, use_fallback=True)
+            
+            # ===== STRATEGY 5: Try parsing with LangChain parser =====
             try:
                 return parser.parse(content)
             except Exception as parse_err:
-                # Final fallback: try to extract JSON with regex
-                json_match = re.search(r'(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})', content, re.DOTALL)
-                if json_match:
-                    return parser.parse(json_match.group(1))
+                print(f"⚠️ Parser failed: {str(parse_err)[:100]}... Trying fallback extraction")
+                
+                # ===== STRATEGY 6: Regex-based JSON extraction =====
+                # Try to extract outermost JSON object with nested braces support
+                json_pattern = r'\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\}'
+                json_matches = re.findall(json_pattern, content, re.DOTALL)
+                
+                if json_matches:
+                    # Try the largest match first (likely the complete object)
+                    json_matches.sort(key=len, reverse=True)
+                    for match in json_matches:
+                        try:
+                            return parser.parse(match)
+                        except:
+                            continue
+                
+                # ===== STRATEGY 7: Manual JSON parsing as last resort =====
+                try:
+                    import json as json_lib
+                    parsed_json = json_lib.loads(content)
+                    # If we got valid JSON, try to convert it to the expected model
+                    return parser.parse(json_lib.dumps(parsed_json))
+                except:
+                    pass
+                
+                # All strategies failed
                 raise parse_err
+                
         except Exception as e:
+            error_msg = str(e)
+            print(f"❌ Error in _run_raw: {error_msg[:200]}")
+            
+            # Retry with fallback model if not already done
             if not is_retry:
+                print("🔄 Retrying with fallback model...")
                 return self._run_raw(prompt_template, inputs, parser, is_retry=True, use_fallback=True)
-            raise e
+            
+            # If retry also failed, provide helpful error message
+            print("❌ Both primary and fallback models failed. Check your prompt and model configuration.")
+            raise RuntimeError(f"OUTPUT_PARSING_FAILURE: Unable to parse LLM output after multiple attempts. Last error: {error_msg}")
 
     def generate_scope(self, raw_text: str, context: str = "") -> ScopeDocument:
         safe_context = self.truncate_text(context, 4000)
@@ -234,15 +285,25 @@ class AIProcessor:
         template = """
 You are a Business Analyst. Generate a structured JSON scope document.
 
+🚨 CRITICAL OUTPUT RULES:
+- Return ONLY valid JSON. Start with {{ and end with }}
+- NO markdown code blocks (no ```json or ```)
+- NO explanatory text before or after the JSON
+- NO asterisks, bullets, or headers
+
 INSTRUCTIONS:
 1. Study the Reference Examples and adopt their depth and terminology.
 2. Expand the Original Requirements comprehensively.
-3. Output ONLY valid JSON. No markdown, no extra text.
+3. Generate comprehensive lists (minimum 3-5 items per field).
+4. Be specific and detailed in descriptions.
 
 {format_instructions}
 
-Original Requirements: {raw_text}
-Reference Examples: {context}
+Original Requirements:
+{raw_text}
+
+Reference Examples:
+{context}
         """
         prompt = PromptTemplate(
             template=template,
@@ -255,16 +316,29 @@ Reference Examples: {context}
         template = """
 You are a Virtual Project Manager. Generate a comprehensive content framework.
 
+🚨 CRITICAL OUTPUT RULES:
+- Return ONLY valid JSON. Start with {{ and end with }}
+- NO markdown code blocks (no ```json or ```)
+- NO explanatory text before or after the JSON
+- NO asterisks, bullets, or headers
+
 INSTRUCTIONS:
 1. Study the Reference Examples and match their structure and depth.
-2. Identify all pages, navigation items, and assets comprehensively.
-3. Output ONLY valid JSON. No markdown, no extra text.
+2. Identify ALL pages, navigation items, and assets comprehensively.
+3. Include at least 5-8 header_nav items, 3-5 footer_nav items, and 5+ website_assets.
+4. Fill out EVERY field with meaningful, specific content.
+5. Make key_sections arrays with 3-5 items each.
 
 {format_instructions}
 
-SCOPE: {scope}
-ORIGINAL NOTES: {raw_text}
-REFERENCE EXAMPLES: {context}
+SCOPE:
+{scope}
+
+ORIGINAL NOTES:
+{raw_text}
+
+REFERENCE EXAMPLES:
+{context}
         """
         prompt = PromptTemplate(
             template=template,
