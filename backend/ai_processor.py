@@ -177,6 +177,9 @@ class AIProcessor:
 
     def _run_raw(self, prompt_template, inputs, parser, is_retry=False, use_fallback=False):
         """Runs LLM raw and then parses, with recovery and aggressive JSON extraction"""
+        import time
+        import random
+        
         prompt = prompt_template.format(**inputs)
         
         # Create a fresh LLM instance for the call to avoid shared state issues
@@ -193,6 +196,8 @@ class AIProcessor:
 
             res = active_llm.invoke(prompt)
             content = res.content
+            
+            # ... (rest of parsing logic) ...
             
             # ===== STRATEGY 1: Remove markdown code blocks =====
             if "```json" in content:
@@ -211,42 +216,35 @@ class AIProcessor:
                 content = content[first_brace:last_brace+1]
             
             # ===== STRATEGY 3: Clean up common LLM artifacts =====
-            # Remove text before JSON starts
             content = content.strip()
             if content and not content.startswith('{'):
-                # Try to find where JSON actually starts
                 json_start = content.find('{')
                 if json_start > 0:
                     content = content[json_start:]
-            
-            # Remove text after JSON ends
             if content and not content.endswith('}'):
                 json_end = content.rfind('}')
                 if json_end > 0:
                     content = content[:json_end+1]
             
             # ===== STRATEGY 4: Detect schema regurgitation =====
-            # If LLM returned schema definition instead of data
             schema_indicators = ['"properties":', '"$defs":', '"definitions":', '"type": "object"']
             is_schema = any(indicator in content for indicator in schema_indicators)
             
             if is_schema and not is_retry:
-                print("⚠️ LLM returned schema instead of data. Retrying with fallback model...")
+                print("LLM returned schema instead of data. Retrying with fallback model...")
                 return self._run_raw(prompt_template, inputs, parser, is_retry=True, use_fallback=True)
             
             # ===== STRATEGY 5: Try parsing with LangChain parser =====
             try:
                 return parser.parse(content)
             except Exception as parse_err:
-                print(f"⚠️ Parser failed: {str(parse_err)[:100]}... Trying fallback extraction")
+                print(f"Parser failed: {str(parse_err)[:100]}... Trying fallback extraction")
                 
                 # ===== STRATEGY 6: Regex-based JSON extraction =====
-                # Try to extract outermost JSON object with nested braces support
                 json_pattern = r'\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\}'
                 json_matches = re.findall(json_pattern, content, re.DOTALL)
                 
                 if json_matches:
-                    # Try the largest match first (likely the complete object)
                     json_matches.sort(key=len, reverse=True)
                     for match in json_matches:
                         try:
@@ -258,26 +256,37 @@ class AIProcessor:
                 try:
                     import json as json_lib
                     parsed_json = json_lib.loads(content)
-                    # If we got valid JSON, try to convert it to the expected model
                     return parser.parse(json_lib.dumps(parsed_json))
                 except:
                     pass
                 
-                # All strategies failed
                 raise parse_err
                 
         except Exception as e:
-            error_msg = str(e)
-            print(f"❌ Error in _run_raw: {error_msg[:200]}")
+            error_msg = str(e).lower()
+            
+            # Handle Rate Limits (429) specifically
+            if "429" in error_msg or "rate limit" in error_msg:
+                wait_time = random.uniform(20, 40) # Aggressive wait for 429
+                print(f"Rate limit hit. Waiting {wait_time:.1f}s before retry...")
+                time.sleep(wait_time)
+                if not is_retry:
+                    return self._run_raw(prompt_template, inputs, parser, is_retry=True, use_fallback=True)
+                # If already retried and still hitting limits, maybe switch provider or fail gracefully
+                # For now, let's try one more deep sleep if it was a retry
+                print(f"Still rate limited. Sleeping extra 10s...")
+                time.sleep(10)
+                # Fallthrough to standard logic
+            
+            print(f"Error in _run_raw: {str(e)[:200]}")
             
             # Retry with fallback model if not already done
             if not is_retry:
-                print("🔄 Retrying with fallback model...")
+                print("Retrying with fallback model...")
                 return self._run_raw(prompt_template, inputs, parser, is_retry=True, use_fallback=True)
             
             # If retry also failed, provide helpful error message
-            print("❌ Both primary and fallback models failed. Check your prompt and model configuration.")
-            raise RuntimeError(f"OUTPUT_PARSING_FAILURE: Unable to parse LLM output after multiple attempts. Last error: {error_msg}")
+            raise RuntimeError(f"ALL ATTEMPTS FAILED: {str(e)}")
 
     def generate_scope(self, raw_text: str, context: str = "") -> ScopeDocument:
         safe_context = self.truncate_text(context, 4000)
@@ -288,8 +297,9 @@ You are a Business Analyst. Generate a structured JSON scope document.
 🚨 CRITICAL OUTPUT RULES:
 - Return ONLY valid JSON. Start with {{ and end with }}
 - NO markdown code blocks (no ```json or ```)
-- NO explanatory text before or after the JSON
-- NO asterisks, bullets, or headers
+- NO explanatory text before or after the JSON.
+- GENERATE MINIMUM 5-7 ITEMS PER LIST (e.g. 5 objectives, 5 in-scope items).
+- DO NOT return empty lists. Invent plausible details based on context if needed.
 
 INSTRUCTIONS:
 1. Study the Reference Examples and adopt their depth and terminology.
@@ -318,16 +328,16 @@ You are a Virtual Project Manager. Generate a comprehensive content framework.
 
 🚨 CRITICAL OUTPUT RULES:
 - Return ONLY valid JSON. Start with {{ and end with }}
-- NO markdown code blocks (no ```json or ```)
-- NO explanatory text before or after the JSON
-- NO asterisks, bullets, or headers
+- NO markdown code blocks.
+- GENERATE MINIMUM 8-12 HEADER NAV ITEMS.
+- GENERATE MINIMUM 5-8 FOOTER NAV ITEMS.
+- GENERATE MINIMUM 6-10 WEBSITE ASSETS.
+- FILL ALL FIELDS. NO EMPTY STRINGS.
 
 INSTRUCTIONS:
 1. Study the Reference Examples and match their structure and depth.
 2. Identify ALL pages, navigation items, and assets comprehensively.
-3. Include at least 5-8 header_nav items, 3-5 footer_nav items, and 5+ website_assets.
-4. Fill out EVERY field with meaningful, specific content.
-5. Make key_sections arrays with 3-5 items each.
+3. Be EXTREMELY detailed. Do not summarize.
 
 {format_instructions}
 
