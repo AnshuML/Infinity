@@ -38,7 +38,7 @@ from io import BytesIO
 def get_blank_framework_excel():
     output = BytesIO()
     # Minimal implementation to avoid dependency on updated backend
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
         h_cols = ['MAIN NAV. ITEM/LAUNCH POINT', 'DROPDOWN/NEXT STOP', 'FINAL DESTINATION', 'PAGE TYPE', 'PAGE DESCRIPTION', 'KEY SECTIONS/FEATURES', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
         pd.DataFrame(columns=h_cols).to_excel(writer, sheet_name='header navigation content', index=False)
         f_cols = ['FOOTER MENU TITLE', 'NESTED MENU ITEMS', 'PAGE TYPE', 'PAGE DESCRIPTION', 'KEY SECTIONS/FEATURES', 'CONTENT TYPE', '🔗 CONTENT LINK', '📝 STATUS', '💬 CLIENT NOTES']
