@@ -487,6 +487,10 @@ else:
                             st.error(f"Framework generation failed: {e}")
                             st.session_state['vpm_logs'].append(f"ERROR: {str(e)}")
 
+                    frame = st.session_state.get('vpm_framework')
+                    if frame:
+                        st.info(f" **CTA Strategy:** {frame.cta_strategy}")
+
                     st.write("###  Visual Architecture")
                     try:
                         import graphviz
