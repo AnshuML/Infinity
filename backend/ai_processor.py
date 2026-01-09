@@ -285,7 +285,18 @@ class AIProcessor:
                 except Exception:
                     pass
             
-            # ===== STRATEGY 3: Clean up common LLM artifacts =====
+            # ===== STRATEGY 5: Expand ellipsis [...] before parsing =====
+            import json as json_lib
+            try:
+                # Replace [...] with [] to ensure valid JSON
+                content_fixed = content.replace('[...]', '[]')
+                # Try parsing to verify structure
+                parsed = json_lib.loads(content_fixed)
+                if isinstance(parsed, dict):
+                    content = json_lib.dumps(parsed)
+            except Exception:
+                # If that fails, replace [...] with empty arrays as last resort
+                content = content.replace('[...]', '[]')
             content = content.strip()
             
             # Handle "continuation" response where model skips the opening brace because it was in the prompt
