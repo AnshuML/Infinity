@@ -258,6 +258,11 @@ class AIProcessor:
             
             # ===== STRATEGY 3: Clean up common LLM artifacts =====
             content = content.strip()
+            
+            # Handle "continuation" response where model skips the opening brace because it was in the prompt
+            if content.startswith('"header_nav"') or content.startswith('"project_title"'):
+                 content = "{" + content
+            
             if content and not content.startswith('{'):
                 json_start = content.find('{')
                 if json_start > 0:
@@ -373,40 +378,37 @@ Reference Examples:
     def generate_framework(self, scope: ScopeDocument, raw_text: str, context: str = "") -> ContentFramework:
         safe_context = self.truncate_text(context, 4000)
         template = """
-You are a Virtual Project Manager. Generate a comprehensive content framework.
+You are a JSON-generating API for a web application.
+Your ONLY purpose is to accept requirements and output a valid JSON object matching the schema below.
 
-🚨 CRITICAL OUTPUT RULES:
-- Return ONLY valid JSON. Start with { and end with }
-- NO markdown code blocks. NO reports. NO introductory text.
-- GENERATE MINIMUM 8-12 HEADER NAV ITEMS.
-- GENERATE MINIMUM 5-8 FOOTER NAV ITEMS.
-- GENERATE MINIMUM 6-10 WEBSITE ASSETS.
-- FILL ALL FIELDS. "key_sections" MUST have 3-5 specific bullet points. NO EMPTY STRINGS.
-- "page_description" MUST be at least 15 words.
+🚨 STRICT OUTPUT RULES:
+1. Output MUST be valid JSON.
+2. START with {{ and END with }}
+3. DO NOT write a report, summary, or introduction.
+4. DO NOT use Markdown formatting like **Bold** or ## Headers.
+5. DO NOT include "Structural DNA", "Header Nav", or "Gap Analysis" as text headings.
 
-INSTRUCTIONS:
-1. Study the Reference Examples and match their structure and depth.
-2. Identify ALL pages, navigation items, and assets comprehensively.
-3. Be EXTREMELY detailed. Do not summarize.
+{format_instructions}
+
+CONTEXT:
+{context}
 
 SCOPE:
 {scope}
 
-ORIGINAL NOTES:
+REQUIREMENTS:
 {raw_text}
 
-REFERENCE EXAMPLES:
-{context}
-
-REQUIRED FORMAT (STRICT JSON ONLY):
-{format_instructions}
-
-FINAL CHECK: Ensure the output is PURE JSON using the format above. No text before or after.
+OUTPUT:
+```json
+{{
+  "header_nav": [
 """
         prompt = PromptTemplate(
             template=template,
             input_variables=["scope", "raw_text", "context", "format_instructions"],
         )
+        # Prime the generation with the start of the JSON to force compliance
         return self._run_raw(prompt, {"scope": scope.json(), "raw_text": self.truncate_text(raw_text, 2000), "context": safe_context, "format_instructions": SIMPLIFIED_FRAMEWORK_FORMAT}, self.framework_parser)
 
 
