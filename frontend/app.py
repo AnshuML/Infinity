@@ -482,10 +482,10 @@ else:
                             framework = processor.generate_framework(st.session_state['vpm_scope'], st.session_state['vpm_raw_input'], ref_context)
                             st.session_state['vpm_framework'] = framework
                             st.session_state['vpm_logs'].append("Visual architecture mapped successfully.")
+                            st.info(f" **CTA Strategy:** {framework.cta_strategy}")
                         except Exception as e:
                             st.error(f"Framework generation failed: {e}")
                             st.session_state['vpm_logs'].append(f"ERROR: {str(e)}")
-                    st.info(f" **CTA Strategy:** {frame.cta_strategy}")
 
                     st.write("###  Visual Architecture")
                     try:
