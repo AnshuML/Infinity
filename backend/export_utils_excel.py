@@ -89,7 +89,7 @@ def get_header_nav_excel(framework):
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, startrow=1)
+        df.to_excel(writer, index=False, startrow=0)
         _apply_standard_styling(writer.book.active, df, "1️⃣ HEADER NAVIGATION ITEMS")
     return output.getvalue()
 
@@ -110,7 +110,7 @@ def get_footer_nav_excel(framework):
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, startrow=1)
+        df.to_excel(writer, index=False, startrow=0)
         _apply_standard_styling(writer.book.active, df, "2️⃣ FOOTER NAVIGATION ITEMS")
     return output.getvalue()
 
@@ -128,7 +128,7 @@ def get_website_assets_excel(framework):
         })
     df = pd.DataFrame(data)
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, startrow=1)
+        df.to_excel(writer, index=False, startrow=0)
         _apply_standard_styling(writer.book.active, df, "3️⃣ WEBSITE ASSETS")
     return output.getvalue()
 
