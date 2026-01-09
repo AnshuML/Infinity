@@ -7,7 +7,31 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 from ai_processor import AIProcessor
 from validation_engine import ValidationEngine
-from data_utils import read_docx, read_pdf, read_xlsx, get_example_paths
+from data_utils import read_docx, read_pdf, read_xlsx
+
+def get_example_paths(data_dir):
+    out = []
+    if not os.path.exists(data_dir):
+        return out
+    for item in os.listdir(data_dir):
+        item_path = os.path.join(data_dir, item)
+        if os.path.isdir(item_path) and item.startswith("Example"):
+            input_dir = os.path.join(item_path, "input")
+            output_dir = os.path.join(item_path, "output")
+            input_files = []
+            output_files = []
+            if os.path.exists(input_dir):
+                for f in os.listdir(input_dir):
+                    input_files.append(os.path.join(input_dir, f))
+            if os.path.exists(output_dir):
+                for f in os.listdir(output_dir):
+                    output_files.append(os.path.join(output_dir, f))
+            out.append({
+                "name": item,
+                "input_files": input_files,
+                "output_files": output_files
+            })
+    return out
 from export_utils_excel import framework_to_excel, scope_to_excel, get_header_nav_excel, get_footer_nav_excel, get_website_assets_excel
 from quality_checks import check_scope, check_framework
 
