@@ -458,6 +458,7 @@ You are a JSON-only API. Your ONLY job is to output a valid JSON object matching
 4. DO NOT write any explanatory text outside the JSON.
 5. If you must include a list, use JSON arrays, not bullet points.
 6. DO NOT wrap the JSON in ```json or any code block.
+7. PROVIDE RICH, DETAILED CONTENT: include multiple navigation items, detailed descriptions, and concrete examples.
 
 {format_instructions}
 
@@ -471,7 +472,7 @@ REQUIREMENTS:
 {raw_text}
 
 OUTPUT:
-{{
+{
 """
         prompt = PromptTemplate(
             template=template,

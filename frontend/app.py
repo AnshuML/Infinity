@@ -301,7 +301,7 @@ st.markdown('<p style="color: #94a3b8; font-size: 1.1rem; margin-top: -15px;">AI
 
 with st.sidebar:
     st.header("VPM Control Center")
-    provider = st.selectbox("Provider", ["Groq", "Gemini", "Hybrid (Groq+Gemini)"])
+    provider = st.selectbox("Provider", ["Gemini Only", "Groq", "Hybrid (Groq+Gemini)"])
     
     # Read from .env only
     final_groq = os.getenv("GROQ_API_KEY")
@@ -351,7 +351,10 @@ with st.sidebar:
 if not auth_ok:
     st.warning("Please configure API keys to begin.")
 else:
-    mapped_provider = "groq" if provider == "Groq" else ("gemini" if provider == "Gemini" else "hybrid")
+    if provider == "Gemini Only":
+        mapped_provider = "gemini"
+    else:
+        mapped_provider = "groq" if provider == "Groq" else ("gemini" if provider == "Gemini" else "hybrid")
     processor = AIProcessor(provider=mapped_provider, groq_api_key=final_groq, google_api_key=final_google)
     engine = ValidationEngine()
 
