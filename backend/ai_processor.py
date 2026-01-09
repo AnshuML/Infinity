@@ -378,15 +378,15 @@ Reference Examples:
     def generate_framework(self, scope: ScopeDocument, raw_text: str, context: str = "") -> ContentFramework:
         safe_context = self.truncate_text(context, 4000)
         template = """
-You are a JSON-generating API for a web application.
-Your ONLY purpose is to accept requirements and output a valid JSON object matching the schema below.
+You are a JSON-only API. Your ONLY job is to output a valid JSON object matching the schema.
 
-🚨 STRICT OUTPUT RULES:
-1. Output MUST be valid JSON.
-2. START with {{ and END with }}
-3. DO NOT write a report, summary, or introduction.
-4. DO NOT use Markdown formatting like **Bold** or ## Headers.
-5. DO NOT include "Structural DNA", "Header Nav", or "Gap Analysis" as text headings.
+🚨 ABSOLUTE RULES:
+1. OUTPUT MUST START WITH { AND END WITH } — NO MARKDOWN.
+2. DO NOT write any headings like "HYBRID INTELLIGENCE" or "STRUCTURAL DNA".
+3. DO NOT use emojis or decorative formatting.
+4. DO NOT write any explanatory text outside the JSON.
+5. If you must include a list, use JSON arrays, not bullet points.
+6. DO NOT wrap the JSON in ```json or any code block.
 
 {format_instructions}
 
@@ -400,9 +400,7 @@ REQUIREMENTS:
 {raw_text}
 
 OUTPUT:
-```json
 {{
-  "header_nav": [
 """
         prompt = PromptTemplate(
             template=template,
