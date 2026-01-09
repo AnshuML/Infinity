@@ -175,6 +175,49 @@ class AIProcessor:
             return text[:max_chars] + "... [TRUNCATED]"
         return text
 
+    def repair_json(self, broken_text: str, parser) -> dict:
+        """Attempts to repair non-JSON output using an LLM call."""
+        print("🔧 repairing malformed output...")
+        template = """
+        You are a Data Cleaning Assistant. 
+        Your ONLY job is to convert the following text into valid JSON that matches the required schema.
+        
+        RULES:
+        1. Keep all content from the input text.
+        2. Output ONLY valid JSON.
+        3. No markdown, no corrections text.
+        
+        INPUT TEXT:
+        {text}
+        
+        REQUIRED SCHEMA/FORMAT:
+        {format_instructions}
+        """
+        # Get instructions from parser
+        fmt = parser.get_format_instructions()
+        
+        prompt = PromptTemplate(template=template, input_variables=["text", "format_instructions"])
+        
+        # Use fallback LLM (8b) for repairs as it's fast and good at formatting
+        try:
+            res = self.fallback_llm.invoke(prompt.format(text=broken_text[:12000], format_instructions=fmt))
+            content = res.content
+            
+            # Clean again
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0].strip()
+            elif "```" in content:
+                 content = content.split("```")[1].split("```")[0].strip()
+                 
+            json_start = content.find('{')
+            json_end = content.rfind('}')
+            if json_start != -1 and json_end != -1:
+                content = content[json_start:json_end+1]
+                
+            return parser.parse(content)
+        except Exception as e:
+            raise ValueError(f"Repair validation failed: {e}")
+
     def _run_raw(self, prompt_template, inputs, parser, is_retry=False, use_fallback=False):
         """Runs LLM raw and then parses, with recovery and aggressive JSON extraction"""
         import time
@@ -196,8 +239,6 @@ class AIProcessor:
 
             res = active_llm.invoke(prompt)
             content = res.content
-            
-            # ... (rest of parsing logic) ...
             
             # ===== STRATEGY 1: Remove markdown code blocks =====
             if "```json" in content:
@@ -260,6 +301,14 @@ class AIProcessor:
                 except:
                     pass
                 
+                # ===== STRATEGY 8: SELF-CORRECTION (Agentic Repair) =====
+                # If content exists but is not JSON (text report), try to convert it.
+                if len(content) > 50:
+                    try:
+                        return self.repair_json(res.content, parser) # Use original full content
+                    except Exception as repair_err:
+                         print(f"Repair attempt failed: {repair_err}")
+
                 raise parse_err
                 
         except Exception as e:
